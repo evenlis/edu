@@ -97,21 +97,6 @@ Node* create_tree(int* array, int size){
     node->value = array[i];
     insert_node(&root, node);
   }
-  /*
-  root->value = 5;
-  Node* node1 = (Node*)malloc(sizeof(Node));
-  Node* node2 = (Node*)malloc(sizeof(Node));
-  Node* node3 = (Node*)malloc(sizeof(Node));
-  Node* node4 = (Node*)malloc(sizeof(Node));
-  node1->value = 3;
-  node2->value = 1;
-  node3->value = 4;
-  node4->value = 7;
-  insert_node(&root, node1);
-  insert_node(&root, node2);
-  insert_node(&root, node3);
-  insert_node(&root, node4);
-  */
   return root;
 }
 
