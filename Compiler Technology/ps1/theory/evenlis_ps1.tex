@@ -23,14 +23,16 @@ Compilers translate source code into executable machine code which may then be e
   \node[initial,state] (S)      {`$S0$`};
   \node[state]         (q1) [right of=S]  {`$S1$`};
   \node[state]         (q2) [right of=q1] {`$S2$`};
-  \node[state,accepting]         (q3) [right of=q2] {`$S3$`};
+  \node[state]         (q3) [right of=q2] {`$S3$`};
+  \node[state, accepting] (q4) [right of=q3] {`$S4$`};
 
   \path[->] (S)  edge [bend left] node {1} (q1)
-        (q1) edge [bend left]  node {0} (q2)
+        (q1) edge [bend left]  node {1} (q2)
+             edge [loop above] node {0} (q1)
         (q2) edge [bend left]  node {0} (q3)
-             edge [loop above] node {1} (q2)
-             (q3) edge [loop above] node {0} (q3)
-             edge [bend left]  node {1} (q2);
+        (q3) edge [loop above] node {1} (q3)
+             edge [bend left]  node {0} (q4)
+        (q4) edge [loop above] node {0} (q4);
 \end{tikzpicture}
 \item
 The language includes even binary numbers $\ge$ 4, e.g. 100, 10100 or 1010101110001010010010110
