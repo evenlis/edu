@@ -16,3 +16,8 @@
 *.exe
 *.out
 *.app
+
+*.aux
+*.log
+*.synctex.gz
+_*.tex
