@@ -2,7 +2,7 @@ import java.util.*;
 import java.security.*;
 
 public class LenientSecurityManager extends SecurityManager {
-    private HashSet permissions;
+    private Hashtable grantedPermissions;
 
     public LenientSecurityManager(){
 	permissions = new HashSet();
@@ -12,8 +12,8 @@ public class LenientSecurityManager extends SecurityManager {
 	try{
 	    super.checkPermission(perm);
 	} catch(AccessControlException e){
-	    if(!permissions.contains(perm)){
-		permissions.add(perm);
+	    if(grantedPermissions.get(perm) == null){
+		grantedPermissions.put(perm,perm);
 	    }
 	}
     }
