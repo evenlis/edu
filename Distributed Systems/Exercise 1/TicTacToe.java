@@ -7,14 +7,8 @@ import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.RMISecurityManager;
+import java.rmi.RemoteException;
 
-/**
- * A Tic Tac Toe application.
- * Currently this is a stand-alone application where
- * players take alternating turns using the same computer.
- * <p/>
- * The task is to transform it to a networking application using RMI.
- */
 public class TicTacToe extends JFrame implements ListSelectionListener, TicTacToeInterface
 {
     private static final int BOARD_SIZE = 15;
@@ -23,33 +17,30 @@ public class TicTacToe extends JFrame implements ListSelectionListener, TicTacTo
     private final JLabel statusLabel = new JLabel();
     private final char playerMarks[] = {'X', 'O'};
     private int currentPlayer = 0; // Player to set the next mark.
+    private char opponentMark;
+    private TicTacToeInterface server;
+    private boolean myTurn;
 
     public static void main(String args[])
     {
 	System.setSecurityManager(new LenientSecurityManager());
 	String address = "127.0.0.1";
-	String host = (args.length > 0 ? args[0] : address)+":3070";
+	String host = (args.length > 0 ? args[0] : address);
+	TicTacToe obj = new TicTacToe();
 	try{
-	    System.out.println("1.1");
-	    TicTacToe obj = new TicTacToe();
-	    System.out.println("1.2");
 	    TicTacToeInterface stub = (TicTacToeInterface)UnicastRemoteObject.exportObject(obj, 0);
-	    System.out.println("1.3");
 	    Registry registry = LocateRegistry.createRegistry(3070);
-	    System.out.println("1.4");
 	    registry.rebind("tictactoe", stub);
 	    registry.rebind("pelle", stub);
-	    System.out.println("1.5");
-	    System.out.println("Server running");
+	    registry.rebind("fjes", stub);
+	    obj.setOpponent(stub);
+
 	} catch(Exception e) {
 	    try{
-		System.out.println("2.1");
 		Registry registry = LocateRegistry.getRegistry(host, 3070);
-		System.out.println("2.2");
 		TicTacToeInterface stub = (TicTacToeInterface)registry.lookup("tictactoe");
-		System.out.println("2.3");
 		System.out.println("Server setup failed, client connected");
-		System.out.println("2.4");
+		stub.setOpponent(obj);
 	    } catch(Exception allHopeIsDead){
 		allHopeIsDead.printStackTrace();
 		System.err.println("You're screwed");
@@ -117,5 +108,49 @@ public class TicTacToe extends JFrame implements ListSelectionListener, TicTacTo
 	if (boardModel.setCell(x, y, playerMarks[currentPlayer]))
 	    setStatusMessage("Player " + playerMarks[currentPlayer] + " won!");
 	currentPlayer = 1 - currentPlayer; // The next turn is by the other player.
+	try{
+	    if(server != null){
+		server.setMark(x, y);
+		this.setMyTurn(false);
+	    }
+	} catch(RemoteException exc){
+	    System.err.println("Piss");
+	}
     }
+
+    public void setMark(int x, int y)throws RemoteException{
+	boardModel.setCell(x, y, opponentMark);
+	System.out.println("Tegnetid");
+	repaint();
+    }
+
+    public void setOpponent(TicTacToeInterface server)throws RemoteException{
+	this.server = server;
+	System.out.println(server);
+    }
+
+    public void setOpponentMark(char opponentMark)throws RemoteException{
+	this.opponentMark = opponentMark;
+    }
+
+    public void newGame()throws RemoteException{
+	for(int row = 0; row < board.getRowCount(); row++)
+	    for(int col = 0; col < board.getColumnCount(); col++)
+		boardModel.setCell(row, col, ' ');
+	repaint();
+    }
+
+    public void leaveGame()throws RemoteException{
+	server = null;
+	newGame();
+    }
+
+    public void setMyTurn(boolean myTurn)throws RemoteException{
+	this.myTurn = myTurn;
+    }
+
+    public boolean isMyTurn()throws RemoteException{
+	return myTurn;
+    }
+
 }
