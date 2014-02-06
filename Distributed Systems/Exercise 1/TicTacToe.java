@@ -6,6 +6,7 @@ import java.awt.*;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
+import java.rmi.RMISecurityManager;
 
 /**
  * A Tic Tac Toe application.
@@ -25,24 +26,30 @@ public class TicTacToe extends JFrame implements ListSelectionListener, TicTacTo
 
     public static void main(String args[])
     {
+	System.setSecurityManager(new LenientSecurityManager());
 	String address = "127.0.0.1";
 	String host = (args.length > 0 ? args[0] : address)+":3070";
 	try{
-	    System.out.println("1");
+	    System.out.println("1.1");
 	    TicTacToe obj = new TicTacToe();
-	    System.out.println("2");
+	    System.out.println("1.2");
 	    TicTacToeInterface stub = (TicTacToeInterface)UnicastRemoteObject.exportObject(obj, 0);
-	    System.out.println("3");
+	    System.out.println("1.3");
 	    Registry registry = LocateRegistry.createRegistry(3070);
-	    System.out.println("4");
+	    System.out.println("1.4");
 	    registry.rebind("tictactoe", stub);
-	    System.out.println("5");
+	    registry.rebind("pelle", stub);
+	    System.out.println("1.5");
 	    System.out.println("Server running");
 	} catch(Exception e) {
 	    try{
-		Registry registry = LocateRegistry.getRegistry(host);
+		System.out.println("2.1");
+		Registry registry = LocateRegistry.getRegistry(host, 3070);
+		System.out.println("2.2");
 		TicTacToeInterface stub = (TicTacToeInterface)registry.lookup("tictactoe");
+		System.out.println("2.3");
 		System.out.println("Server setup failed, client connected");
+		System.out.println("2.4");
 	    } catch(Exception allHopeIsDead){
 		allHopeIsDead.printStackTrace();
 		System.err.println("You're screwed");
