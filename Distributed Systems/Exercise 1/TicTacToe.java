@@ -34,17 +34,19 @@ public class TicTacToe extends JFrame implements ListSelectionListener, TicTacTo
 	    registry.rebind("pelle", stub);
 	    registry.rebind("fjes", stub);
 	    // obj.setOpponent(stub);
+	    stub.setOpponentMark('X');
 
 	} catch(Exception e) {
 	    try{
-			Registry registry = LocateRegistry.getRegistry(host, 3070);
-			TicTacToeInterface stub = (TicTacToeInterface)registry.lookup("tictactoe");
-			System.out.println("Server setup failed, client connected");
-			stub.setOpponent(obj);
-			obj.setOpponent(stub);
-		    } catch(Exception allHopeIsDead){
-			allHopeIsDead.printStackTrace();
-			System.err.println("You're screwed");
+		Registry registry = LocateRegistry.getRegistry(host, 3070);
+		TicTacToeInterface stub = (TicTacToeInterface)registry.lookup("tictactoe");
+		System.out.println("Server setup failed, client connected");
+		stub.setOpponent(obj);
+		obj.setOpponent(stub);
+		obj.setOpponentMark('O');
+	    } catch(Exception allHopeIsDead){
+		allHopeIsDead.printStackTrace();
+		System.err.println("You're screwed");
 	    }
 	}
     }
@@ -101,7 +103,7 @@ public class TicTacToe extends JFrame implements ListSelectionListener, TicTacTo
     public void valueChanged(ListSelectionEvent e)
     {
 
-    	
+
 	if (e.getValueIsAdjusting())
 	    return;
 	int x = board.getSelectedColumn();
@@ -109,25 +111,30 @@ public class TicTacToe extends JFrame implements ListSelectionListener, TicTacTo
 	if (x == -1 || y == -1 || !boardModel.isEmpty(x, y))
 	    return;
 
-try{
+	try{
 
-		System.out.println("server: " + server);
+	    System.out.println("server: " + server);
 	    if(server != null){
 		server.setMark(x, y);
 		this.setMyTurn(false);
 	    }
 	} catch(RemoteException exc){
-	    System.err.println("Piss");
+
 	}
 
-	if (boardModel.setCell(x, y, playerMarks[currentPlayer]))
-	    setStatusMessage("Player " + playerMarks[currentPlayer] + " won!");
+	if (boardModel.setCell(x, y, myMark())){
+	    setStatusMessage("Player " + myMark() + " won!");
+	}
 	currentPlayer = 1 - currentPlayer; // The next turn is by the other player.
 
     }
 
+    private char myMark(){
+	return opponentMark == 'O' ? 'X' : 'O';
+    }
+
     public void setMark(int x, int y)throws RemoteException{
-	boardModel.setCell(x, y, 'x');
+	boardModel.setCell(x, y, opponentMark == 0 ? 'f' : opponentMark);
 	System.out.println("Tegnetid");
 	repaint();
     }
