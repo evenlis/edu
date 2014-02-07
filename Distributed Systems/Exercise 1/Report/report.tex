@@ -1,0 +1,33 @@
+\documentclass{article}
+
+\usepackage{datetime}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=30mm]{geometry}
+\setlength{\parskip}{\medskipamount}
+\setlength{\parindent}{0pt}	
+
+\begin{document}
+\title{Øving 1}
+\author{Even Lislebø \& Øystein Tandberg}
+\date{\today}
+\maketitle
+
+\section*{Løsning av oppgaven}
+For å løse oppgaven sendte vi et interface over nettverket slik at man har en fjernreferanse til motstanderens instanse av spillet. Dette interfacet brukes til å holde spillet persistent hos begge spillerene, ved å kalle metoder på objektet man har en fjernreferanse til. Vi har brukt Registry rammeverket i Java istedet for Naming for å gjøre oppkoblingen mellom spillerene.\\
+
+Når programmet starter ser den etter om det går ann å starte en server på port 3070, om dette ikke går finnes det allerede en server kjørende på denne porten og kobler da til denne. På denne måten kan man kjøre samme koden for å være server og klient.\\
+
+Metodene i interfacet vi brukte er som følger:
+\begin{itemize}
+
+\item void setMark(int x, int y)
+\item void setOpponent(TicTacToeInterface server)
+\item void setOpponentMark(char mark)
+\item void newGame()
+\item void leaveGame()
+\item void setMyTurn(boolean myTurn)
+\item boolean isMyTurn()
+\end{itemize}
+
+
+\end{document}
